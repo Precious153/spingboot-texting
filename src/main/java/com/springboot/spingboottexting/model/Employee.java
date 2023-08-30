@@ -2,6 +2,7 @@ package com.springboot.spingboottexting.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.redis.core.RedisHash;
 
 @Setter
 @Getter
@@ -10,7 +11,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "employees")
-
+@RedisHash("Employee")
 public class Employee {
     private long id;
     private String firstName;
