@@ -13,10 +13,7 @@ import java.util.Optional;
 public interface EmployeeService {
     Employee saveEmployee(Employee employee);
     List<Employee> getAllEmployees();
-    @Cacheable("employees")
     Optional<Employee> getEmployeeById(long id);
-    @CachePut(value = "employees", key = "#employee.id")
     Employee updateEmployee(Employee updatedEmployee);
-    @CacheEvict(value = "employees", key = "#id")
     void deleteEmployee(long id);
 }

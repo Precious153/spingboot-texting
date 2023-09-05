@@ -75,6 +75,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>3.7.0</version> <!-- Use the latest version -->
+		</dependency>
 	</dependencies>
 
 	<build>

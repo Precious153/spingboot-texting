@@ -11,7 +11,6 @@ import org.springframework.data.redis.core.RedisHash;
 
 @Entity
 @Table(name = "employees")
-@RedisHash("Employee")
 public class Employee {
     private long id;
     private String firstName;
