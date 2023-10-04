@@ -28,12 +28,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee saveEmployee(Employee employee) {
-        return null;
+        return employeeRepository.save(employee);
     }
 
     @Override
     public List<Employee> getAllEmployees() {
-        return null;
+        return employeeRepository.findAll();
     }
 
     @Override
