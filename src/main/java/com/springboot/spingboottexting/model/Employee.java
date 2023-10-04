@@ -4,15 +4,19 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
+
 @Setter
 @Getter
 @AllArgsConstructor
 @Builder
 
-@Entity
 @Table(name = "employees")
+@Entity
 public class Employee {
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private long id;
     private String firstName;
     private String lastName;
     private String email;
@@ -25,9 +29,6 @@ public class Employee {
         this.lastName = lastName;
         this.email = email;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     public long getId() {
         return id;
