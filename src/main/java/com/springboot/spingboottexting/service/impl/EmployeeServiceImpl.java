@@ -25,12 +25,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
-
+    @CachePut(value = "employees", key = "#result.id")
     @Override
     public Employee saveEmployee(Employee employee) {
         return employeeRepository.save(employee);
     }
-
+    @Cacheable(value = "employees")
     @Override
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
