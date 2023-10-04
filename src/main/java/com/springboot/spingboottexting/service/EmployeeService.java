@@ -16,17 +16,13 @@ public interface EmployeeService {
     Employee saveEmployee(Employee employee);
 
     List<Employee> getAllEmployees();
+    @Cacheable(value = "employees", key = "#id")
 
     Optional<Employee> getEmployeeById(long id);
+    @CachePut(value = "employees", key = "#result.id")
 
     Employee updateEmployee(Employee updatedEmployee);
+    @CacheEvict(value = "employees", key = "#id")
 
     void deleteEmployee(long id);
-
-    // Custom methods for Redis caching
-    Employee cacheAndSaveEmployee(Employee employee);
-
-    Employee cacheAndUpdateEmployee(Employee updatedEmployee);
-
-    void cacheAndDeleteEmployee(long id);
 }

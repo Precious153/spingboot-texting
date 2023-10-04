@@ -11,7 +11,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +20,6 @@ import java.util.Optional;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
-    @Autowired
-    private RedisTemplate<String, Employee> redisTemplate;
 
     @Autowired
     public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
@@ -58,27 +55,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void deleteEmployee(long id) {
         // Delete the employee from the database
         employeeRepository.deleteById(id);
-    }
-
-    @Override
-    public Employee cacheAndSaveEmployee(Employee employee) {
-        // Implement caching logic for save operation
-        redisTemplate.opsForValue().set("employee_" + employee.getId(), employee);
-        return saveEmployee(employee); // Call the actual save operation
-    }
-
-    @Override
-    public Employee cacheAndUpdateEmployee(Employee updatedEmployee) {
-        // Implement caching logic for update operation
-        redisTemplate.opsForValue().set("employee_" + updatedEmployee.getId(), updatedEmployee);
-        return updateEmployee(updatedEmployee); // Call the actual update operation
-    }
-
-    @Override
-    public void cacheAndDeleteEmployee(long id) {
-        // Implement caching logic for delete operation
-        redisTemplate.delete("employee_" + id);
-        deleteEmployee(id); // Call the actual delete operation
     }
 
     // Other methods like saveEmployee and getAllEmployees go here
