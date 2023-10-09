@@ -6,56 +6,52 @@ import com.springboot.spingboottexting.exception.ResourceNotFoundException;
 import com.springboot.spingboottexting.model.Employee;
 import com.springboot.spingboottexting.repository.EmployeeRepository;
 import com.springboot.spingboottexting.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
 @Service
-@EnableCaching
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private final EmployeeRepository employeeRepository;
 
-    @Autowired
+    private EmployeeRepository employeeRepository;
+
     public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
     @CachePut(value = "employees", key = "#result.id")
     @Override
     public Employee saveEmployee(Employee employee) {
+
+        Optional<Employee> savedEmployee = Optional.ofNullable(employeeRepository.findByEmail(employee.getEmail()));
+        if(savedEmployee.isPresent()){
+            throw new ResourceNotFoundException("Employee", "id", employee);
+        }
         return employeeRepository.save(employee);
     }
-    @Cacheable(value = "employees")
+    @Cacheable("employees")
     @Override
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
-
+    @Cacheable("employeeById")
     @Override
-    @Cacheable(value = "employees", key = "#id")
     public Optional<Employee> getEmployeeById(long id) {
-        // Fetch employee from the database
-        return employeeRepository.findById(id);
+        return Optional.ofNullable(employeeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id)));
     }
-
+    @CacheEvict(value = "employees", allEntries = true)
     @Override
-    @CachePut(value = "employees", key = "#result.id")
     public Employee updateEmployee(Employee updatedEmployee) {
-        // Update the employee in the database
         return employeeRepository.save(updatedEmployee);
     }
-
+    @CacheEvict(value = "employees", allEntries = true)
     @Override
-    @CacheEvict(value = "employees", key = "#id")
     public void deleteEmployee(long id) {
-        // Delete the employee from the database
+        employeeRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Employee", "id", id));
         employeeRepository.deleteById(id);
     }
-
-    // Other methods like saveEmployee and getAllEmployees go here
 }

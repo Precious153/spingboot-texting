@@ -6,8 +6,8 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
-public class SpingbootTextingApplication {
+public class EmployeeApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(SpingbootTextingApplication.class, args);
+		SpringApplication.run(EmployeeApplication.class, args);
 	}
 }

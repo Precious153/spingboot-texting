@@ -10,10 +10,9 @@ import java.io.Serializable;
 @Getter
 @AllArgsConstructor
 @Builder
-
-@Table(name = "employees")
 @Entity
-public class Employee {
+@Table(name = "employees")
+public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long id;
