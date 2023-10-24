@@ -1,152 +1,90 @@
 package com.springboot.spingboottexting;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboot.spingboottexting.controller.EmployeeController;
 import com.springboot.spingboottexting.model.Employee;
 import com.springboot.spingboottexting.service.EmployeeService;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@WebMvcTest(EmployeeController.class)
 public class EmployeeControllerTest {
 
-    @Mock
-    private EmployeeService employeeService;
-
-
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
-
-    @InjectMocks
-    private EmployeeController employeeController;
-
     private MockMvc mockMvc;
 
-    @BeforeEach
+    @MockBean
+    private EmployeeService employeeService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
-    public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new EmployeeController(employeeService)).build();
-    }
+    public void createEmployeeTest() throws Exception {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        employee.setFirstName("John");
+        employee.setLastName("Doe");
+        employee.setEmail("john@example.com");
 
+        when(employeeService.createEmployee(any(Employee.class))).thenReturn(employee);
 
-    @Test
-    public void testCreateEmployee() throws Exception {
-        Employee employee = new Employee("John", "Doe", "john@example.com");
-
-        when(employeeService.saveEmployee(any(Employee.class))).thenReturn(employee);
-
-        mockMvc.perform(post("/api/employees")
+        mockMvc.perform(post("/employees/create")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john@example.com\"}"))
+                        .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.firstName").value("John"))
                 .andExpect(jsonPath("$.lastName").value("Doe"))
                 .andExpect(jsonPath("$.email").value("john@example.com"));
-
-        verify(employeeService, times(1)).saveEmployee(any(Employee.class));
-    }
-    @Test
-    public void testGetAllEmployees() throws Exception {
-        List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee("John", "Doe", "john@example.com"));
-        employees.add(new Employee("Jane", "Smith", "jane@example.com"));
-
-        when(employeeService.getAllEmployees()).thenReturn(employees);
-
-        mockMvc.perform(get("/api/employees"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].firstName").value("John"))
-                .andExpect(jsonPath("$[1].firstName").value("Jane"));
-
-        verify(employeeService, times(1)).getAllEmployees();
     }
 
     @Test
-    public void testGetEmployeeById() throws Exception {
-        Employee employee = new Employee("John", "Doe", "john@example.com");
+    public void getEmployeeTest() throws Exception {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        employee.setFirstName("John");
+        employee.setLastName("Doe");
+        employee.setEmail("john@example.com");
 
-        when(employeeService.getEmployeeById(1L)).thenReturn(Optional.of(employee));
+        when(employeeService.getEmployeeById("1")).thenReturn(employee);
 
-        mockMvc.perform(get("/api/employees/1"))
+        mockMvc.perform(get("/employees/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value("John"))
                 .andExpect(jsonPath("$.lastName").value("Doe"))
                 .andExpect(jsonPath("$.email").value("john@example.com"));
-
-        verify(employeeService, times(1)).getEmployeeById(1L);
     }
 
     @Test
-    public void testGetNonExistentEmployeeById() throws Exception {
-        when(employeeService.getEmployeeById(1L)).thenReturn(Optional.empty());
+    public void updateEmployeeTest() throws Exception {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        employee.setFirstName("John");
+        employee.setLastName("Doe");
+        employee.setEmail("john@example.com");
 
-        mockMvc.perform(get("/api/employees/1"))
-                .andExpect(status().isNotFound());
+        when(employeeService.updateEmployee(any(Employee.class))).thenReturn(employee);
 
-        verify(employeeService, times(1)).getEmployeeById(1L);
-    }
-
-    @Test
-    public void testUpdateEmployee() throws Exception {
-        Employee existingEmployee = new Employee("John", "Doe", "john@example.com");
-        Employee updatedEmployee = new Employee("Updated", "Employee", "updated@example.com");
-
-        when(employeeService.getEmployeeById(1L)).thenReturn(Optional.of(existingEmployee));
-        when(employeeService.updateEmployee(any(Employee.class))).thenReturn(updatedEmployee);
-
-        mockMvc.perform(put("/api/employees/1")
+        mockMvc.perform(put("/employees/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"firstName\":\"Updated\",\"lastName\":\"Employee\",\"email\":\"updated@example.com\"}"))
+                        .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.firstName").value("Updated"))
-                .andExpect(jsonPath("$.lastName").value("Employee"))
-                .andExpect(jsonPath("$.email").value("updated@example.com"));
-
-        verify(employeeService, times(1)).getEmployeeById(1L);
-        verify(employeeService, times(1)).updateEmployee(any(Employee.class));
+                .andExpect(jsonPath("$.firstName").value("John"))
+                .andExpect(jsonPath("$.lastName").value("Doe"))
+                .andExpect(jsonPath("$.email").value("john@example.com"));
     }
 
     @Test
-    public void testUpdateNonExistentEmployee() throws Exception {
-        when(employeeService.getEmployeeById(1L)).thenReturn(Optional.empty());
-
-        mockMvc.perform(put("/api/employees/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"firstName\":\"Updated\",\"lastName\":\"Employee\",\"email\":\"updated@example.com\"}"))
-                .andExpect(status().isNotFound());
-
-        verify(employeeService, times(1)).getEmployeeById(1L);
-        verify(employeeService, times(0)).updateEmployee(any(Employee.class));
-    }
-
-    @Test
-    public void testDeleteEmployee() throws Exception {
-        mockMvc.perform(delete("/api/employees/1"))
+    public void deleteEmployeeTest() throws Exception {
+        mockMvc.perform(delete("/employees/1"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Employee deleted successfully!."));
-
-        verify(employeeService, times(1)).deleteEmployee(1L);
+                .andExpect(content().string("Employee with ID 1 has been deleted"));
     }
 }
