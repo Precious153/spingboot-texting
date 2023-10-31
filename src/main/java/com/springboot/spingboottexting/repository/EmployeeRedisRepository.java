@@ -8,10 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @Repository
 public class EmployeeRedisRepository {
-
     private final RedissonClient redissonClient;
 
     public EmployeeRedisRepository(RedissonClient redissonClient) {
@@ -22,10 +20,7 @@ public class EmployeeRedisRepository {
         RMap<String, Employee> map = redissonClient.getMap("employeeCache");
         map.put(key, employee);
     }
-    public void updateEmployeeInCache(String key, Employee employee) {
-        RMap<String, Employee> map = redissonClient.getMap("employeeCache");
-        map.put(key, employee);
-    }
+
     public Employee getEmployee(String key) {
         RMap<String, Employee> map = redissonClient.getMap("employeeCache");
         return map.get(key);
@@ -35,5 +30,4 @@ public class EmployeeRedisRepository {
         RMap<String, Employee> map = redissonClient.getMap("employeeCache");
         map.remove(key);
     }
-
 }

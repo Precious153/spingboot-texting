@@ -6,14 +6,10 @@ import java.util.List;
 
 public interface EmployeeService {
     Employee createEmployee(Employee employee);
-
-    Employee getEmployeeById(String id);
-
+    Employee getEmployeeById(String phoneNumber);
     List<Employee> getAllEmployees();
-
     Employee updateEmployee(Employee updatedEmployee);
-
-    void deleteEmployee(String id);
+    void deleteEmployee(String phoneNumber);
 
     void saveEmployeeToCache(String key, Employee employee);
 
